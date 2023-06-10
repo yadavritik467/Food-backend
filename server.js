@@ -26,7 +26,7 @@ const app = express()
 const port =  process.env.port
 
 // middleware
-app.use(cors()),
+
 mongoDB()
 cloudinary.config({
   cloud_name:process.env.API_NAME,
@@ -49,7 +49,11 @@ app.use(
 app.use(passport.authenticate("session")),
 app.use(passport.initialize()),
 app.use(passport.session()),
-
+app.use(cors({
+  origin:[process.env.front_url],
+  methods:["GET", "POST","DELETE","PUT"],
+  credentials:true
+})),
 connectPassport()
 
 
@@ -62,7 +66,10 @@ app.use("/caro",carousel)
 app.use("/order",orderRouter)
 app.use("/payment",paymentRouter)
 
-// app.use("/Food",FoodRouter)
+
+app.get("/", (req,res)=>{
+  res.send("working")
+})
 
 
 app.listen(port, ()=>{
