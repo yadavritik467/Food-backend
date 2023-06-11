@@ -1,4 +1,11 @@
-/Frontend
+
 /config/config.env
+/Frontend/node_modules
+/Frontend/public
+/Frontend/src
+/Frontend/package-lock.json
+/Frontend/package.json
+
 /node_modules
 /array_json
+
