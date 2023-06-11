@@ -6,7 +6,7 @@ import  orderRouter  from "./routes/order.js"
 import  paymentRouter  from "./routes/payment.js"
 import  mongoDB  from "./controller/db.js"
 import cors  from "cors"
-// import path from "path"
+
 import {config} from "dotenv"
 import cloudinary from "cloudinary"
 import fileUpload from "express-fileupload"
