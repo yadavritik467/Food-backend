@@ -6,12 +6,11 @@ import  orderRouter  from "./routes/order.js"
 import  paymentRouter  from "./routes/payment.js"
 import  mongoDB  from "./controller/db.js"
 import cors  from "cors"
-// import  User  from "./modals/users.js"
+import path from "path"
 import {config} from "dotenv"
-// import multer from "multer"
+
 import  passport  from 'passport';
-import GoogleStrategy  from 'passport-google-oauth20'
-import cookieSession from "cookie-session"
+
 import { connectPassport } from "./controller/users-controllers.js"
 import session from "express-session"
 import cloudinary from "cloudinary"
@@ -26,11 +25,12 @@ const app = express()
 const port =  process.env.port
 
 // middleware
-app.use(cors({
-  // origin:[process.env.front_url],
-  // methods:["GET", "POST","DELETE","PUT"],
-  // credentials:true
-})),
+// app.use(cors({
+//   origin:[process.env.front_url],
+//   methods:["GET", "POST","DELETE","PUT"],
+//   credentials:true
+// })),
+app.use(cors()),
 mongoDB()
 cloudinary.config({
   cloud_name:process.env.API_NAME,
@@ -53,6 +53,7 @@ app.use(
 app.use(passport.authenticate("session")),
 app.use(passport.initialize()),
 app.use(passport.session()),
+app.use(express.static(path.join(__dirname,'./Frontend/build'))),
 
 connectPassport()
 
@@ -67,8 +68,8 @@ app.use("/order",orderRouter)
 app.use("/payment",paymentRouter)
 
 
-app.get("/", (req,res)=>{
-  res.send("working")
+app.get("*", (req,res)=>{
+  res.sendFile("./Frontend/build/index.html")
 })
 
 
