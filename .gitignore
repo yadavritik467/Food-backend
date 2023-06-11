@@ -1,5 +1,4 @@
-/config/config.env
+/config
 /Frontend
 /node_modules
-/array_json.json
 
