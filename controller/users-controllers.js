@@ -1,56 +1,56 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt"
 import  User  from "../modals/users.js"
-import { google } from "../modals/google.js"
-import passport from 'passport';
-import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+// import { google } from "../modals/google.js"
+// import passport from 'passport';
+// import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 
 
-export const connectPassport = () => {
-//     passport.use(new GoogleStrategy({
-//         clientID: process.env.CLIENT_ID,
-//         clientSecret: process.env.CLIENT_SECRET,
-//         callbackURL: "http://localhost:4500/auth/google/callback",
-//         passReqToCallback: true
-//     },
-//         async (req, accessToken, refreshToken, profile, done) => {
+// export const connectPassport = () => {
+// //     passport.use(new GoogleStrategy({
+// //         clientID: process.env.CLIENT_ID,
+// //         clientSecret: process.env.CLIENT_SECRET,
+// //         callbackURL: "http://localhost:4500/auth/google/callback",
+// //         passReqToCallback: true
+// //     },
+// //         async (req, accessToken, refreshToken, profile, done) => {
      
          
-//                 console.log(profile);
-//             const user = await google.findOne({
-//                 googleId: profile.id,
-//             },)
-//             if(!user){
-//                 const newUser = new google({
-//                     googleId: profile.id,
-//                     name: profile.displayName,
-//                     // number: profile.number,
-//                     // email: profile.email,
-//                     secret: accessToken,
-//                 });
-//                 await newUser.save().then((result)=>{
-//                     console.log(newUser);
-//                     return done(null,user)
-//                 })
-//             }else{
-//                 console.log(user)
-//                 return done(null,user)
-//             }
-//             // console.log(user.email);
-//             // return done(null, user);     
+// //                 console.log(profile);
+// //             const user = await google.findOne({
+// //                 googleId: profile.id,
+// //             },)
+// //             if(!user){
+// //                 const newUser = new google({
+// //                     googleId: profile.id,
+// //                     name: profile.displayName,
+// //                     // number: profile.number,
+// //                     // email: profile.email,
+// //                     secret: accessToken,
+// //                 });
+// //                 await newUser.save().then((result)=>{
+// //                     console.log(newUser);
+// //                     return done(null,user)
+// //                 })
+// //             }else{
+// //                 console.log(user)
+// //                 return done(null,user)
+// //             }
+// //             // console.log(user.email);
+// //             // return done(null, user);     
             
-//         }
-//     )
-//     )
-//     passport.serializeUser(function (user, done) {
-//     done(null, user.id);
-//  });
+// //         }
+// //     )
+// //     )
+// //     passport.serializeUser(function (user, done) {
+// //     done(null, user.id);
+// //  });
  
-//  passport.deserializeUser(async (user, done)=> {
-//     const newUser = await User.findById(id)
-//     done(null, newUser.id);
-//  })
-}
+// //  passport.deserializeUser(async (user, done)=> {
+// //     const newUser = await User.findById(id)
+// //     done(null, newUser.id);
+// //  })
+// }
 
 
 

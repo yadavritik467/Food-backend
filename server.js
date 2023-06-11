@@ -8,11 +8,6 @@ import  mongoDB  from "./controller/db.js"
 import cors  from "cors"
 import path from "path"
 import {config} from "dotenv"
-
-import  passport  from 'passport';
-
-import { connectPassport } from "./controller/users-controllers.js"
-import session from "express-session"
 import cloudinary from "cloudinary"
 import fileUpload from "express-fileupload"
 
@@ -22,15 +17,15 @@ config({path:"./config/config.env"})
 
 const app = express()
 
-const port =  process.env.port
+const port =  process.env.PORT
 
 // middleware
-// app.use(cors({
-//   origin:[process.env.front_url],
-//   methods:["GET", "POST","DELETE","PUT"],
-//   credentials:true
-// })),
-app.use(cors()),
+app.use(cors({
+  origin:[process.env.FRONT_URL],
+  methods:["GET", "POST","DELETE","PUT"],
+  credentials:true
+})),
+// app.use(cors()),
 mongoDB()
 cloudinary.config({
   cloud_name:process.env.API_NAME,
@@ -42,20 +37,7 @@ cloudinary.config({
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 app.use(fileUpload({useTempFiles: true}))
-app.use(
-  session({
-    secret: "dfaadasdasfxdadasdss",
-    resave: false,
-    saveUninitialized: false,
-    name:"coockie"
-  })),
 
-app.use(passport.authenticate("session")),
-app.use(passport.initialize()),
-app.use(passport.session()),
-app.use(express.static(path.join(__dirname,'./Frontend/build'))),
-
-connectPassport()
 
 
 // middleware
@@ -67,10 +49,6 @@ app.use("/caro",carousel)
 app.use("/order",orderRouter)
 app.use("/payment",paymentRouter)
 
-
-app.get("*", (req,res)=>{
-  res.sendFile("./Frontend/build/index.html")
-})
 
 
 app.listen(port, ()=>{
