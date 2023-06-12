@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/static/css/main.b400b0e1.css",
+    "main.js": "/static/js/main.c02e9cab.js",
+    "static/media/fish-market-2328964_1920.jpg": "/static/media/fish-market-2328964_1920.10f2b56ebd2cdb31703c.jpg",
+    "static/media/order-succes.jpg": "/static/media/order-succes.bc4e5ec9a88aed23521a.jpg",
+    "index.html": "/index.html",
+    "main.b400b0e1.css.map": "/static/css/main.b400b0e1.css.map",
+    "main.c02e9cab.js.map": "/static/js/main.c02e9cab.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.b400b0e1.css",
+    "static/js/main.c02e9cab.js"
+  ]
+}
