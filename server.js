@@ -21,7 +21,7 @@ const port =  process.env.PORT
 
 // middleware
 app.use(cors({
-  origin:"/",
+  origin:"http:localhost:3000",
   credentials:true
 })),
 // app.use(cors()),
@@ -34,7 +34,7 @@ cloudinary.config({
   
 })
 app.use(express.json())
-app.use('/',express.static('./build/'))
+// app.use('/',express.static('./build/'))
 app.use(express.urlencoded({extended: true}))
 app.use(fileUpload({useTempFiles: true}))
 
@@ -49,8 +49,8 @@ app.use("/caro",carousel)
 app.use("/order",orderRouter)
 app.use("/payment",paymentRouter)
 
-app.get('*',(req,res)=>{
-  res.sendFile(path.join(__dirname,'./build/index.html'))
+app.get('/',(req,res)=>{
+ res.send("working")
 })
 
 app.listen(port, ()=>{
