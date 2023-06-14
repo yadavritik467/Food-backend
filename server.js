@@ -49,7 +49,7 @@ app.use(
 // Initialize Passport.js
 app.use(passport.initialize());
 app.use(passport.session());
-app.use('/',express.static('./Frontend/build/'))
+app.use('/',express.static('./build/'))
 app.use(express.urlencoded({extended: true}))
 app.use(fileUpload({useTempFiles: true}))
 connectPassport()
@@ -65,7 +65,7 @@ app.use("/order",orderRouter)
 app.use("/payment",paymentRouter)
 
 app.get('*',(req,res)=>{
-  res.sendFile(path.join(__dirname,'./Frontend/build/index.html'))
+  res.sendFile(path.join(__dirname,'./build/index.html'))
 })
 app.listen(port, ()=>{
     console.log(`server is working ${port}`)
