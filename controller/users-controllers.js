@@ -1,56 +1,79 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt"
-import  User  from "../modals/users.js"
+import User from "../modals/users.js"
 // import { google } from "../modals/google.js"
-// import passport from 'passport';
-// import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import passport from 'passport';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 
 
-// export const connectPassport = () => {
-// //     passport.use(new GoogleStrategy({
-// //         clientID: process.env.CLIENT_ID,
-// //         clientSecret: process.env.CLIENT_SECRET,
-// //         callbackURL: "http://localhost:4500/auth/google/callback",
-// //         passReqToCallback: true
-// //     },
-// //         async (req, accessToken, refreshToken, profile, done) => {
-     
-         
-// //                 console.log(profile);
-// //             const user = await google.findOne({
-// //                 googleId: profile.id,
-// //             },)
-// //             if(!user){
-// //                 const newUser = new google({
-// //                     googleId: profile.id,
-// //                     name: profile.displayName,
-// //                     // number: profile.number,
-// //                     // email: profile.email,
-// //                     secret: accessToken,
-// //                 });
-// //                 await newUser.save().then((result)=>{
-// //                     console.log(newUser);
-// //                     return done(null,user)
-// //                 })
-// //             }else{
-// //                 console.log(user)
-// //                 return done(null,user)
-// //             }
-// //             // console.log(user.email);
-// //             // return done(null, user);     
-            
-// //         }
-// //     )
-// //     )
-// //     passport.serializeUser(function (user, done) {
-// //     done(null, user.id);
-// //  });
- 
-// //  passport.deserializeUser(async (user, done)=> {
-// //     const newUser = await User.findById(id)
-// //     done(null, newUser.id);
-// //  })
-// }
+export const connectPassport = (res) => {
+    passport.use(new GoogleStrategy({
+        clientID: process.env.CLIENT_ID,
+        clientSecret: process.env.CLIENT_SECRET,
+        callbackURL: "http://localhost:4500/auth/google/callback",
+        passReqToCallback: true
+    },
+        async (req, res, accessToken, refreshToken, profile, done) => {
+
+
+            console.log(profile);
+            const existingUser = await User.findOne({
+                googleId: profile.id,
+            })
+
+            if (existingUser) {
+                // User already exists, return the user
+                done(null, existingUser);
+            } 
+
+             // Create a new user
+             const user = await User.create({
+                googleId: profile.id,
+                name: profile.displayName,
+                email:profile.emails[0].value,
+                // address: profile.address,
+                // number: profile.number
+            });
+
+            // Set the JWT token
+
+            const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: "365d", })
+            res.json({ token: token})
+            done(null, user,token);
+
+
+
+            // if(!user){
+            //     const newUser = new google({
+            //         googleId: profile.id,
+            //         name: profile.displayName,
+            //         // number: profile.number,
+            //         // email: profile.email,
+            //         secret: accessToken,
+            //     });
+            //     await newUser.save().then((result)=>{
+            //         console.log(newUser);
+            //         return done(null,user)
+            //     })
+            // }else{
+            //     console.log(user)
+            //     return done(null,user)
+            // }
+            // console.log(user.email);
+            // return done(null, user);     
+
+        }
+    )
+    )
+    passport.serializeUser(function (user, done) {
+        done(null, user.id);
+    });
+
+    passport.deserializeUser(async (user, done) => {
+        const newUser = await User.findById(id)
+        done(null, newUser.id);
+    })
+}
 
 
 
@@ -68,7 +91,7 @@ export const register = async (req, res, next) => {
 
         const hashPassword = bcrypt.hashSync(password, 10)
         const user = new User({
-         
+
             name,
             number,
             email,
@@ -76,9 +99,9 @@ export const register = async (req, res, next) => {
             address,
         })
         await user.save()
-        const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: "10s", })
+        const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: "365d", })
 
-        res.status(201).json({ message: "user succesfully created",token })
+        res.status(201).json({ message: "user succesfully created", token })
     } catch (error) {
         console.log(error)
         return res.status(501).json({ message: "Internal server errord" })
@@ -93,8 +116,8 @@ export const login = async (req, res, next) => {
         const { email, password } = req.body
 
         const user = await User.findOne({ email: req.body.email }).select("+password")
-          
-        console.log(user,req.body)
+
+        // console.log(user,req.body)
         if (!user) {
             return res.status(400).json({ message: "User doesn't exist !! please create account " })
         }
@@ -106,7 +129,7 @@ export const login = async (req, res, next) => {
         }
 
         // token
-            console.log(user._id)
+        console.log(user._id)
         const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: "365d", })
         res.json({
             message: "login successfully",
@@ -120,7 +143,7 @@ export const login = async (req, res, next) => {
                 role: user.role
             },
         })
-      
+
     } catch (error) {
         console.log(error);
         return res.status(501).json({ message: "Internal server errord" })

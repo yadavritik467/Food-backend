@@ -4,10 +4,10 @@ import  User  from "../modals/users.js"
 export const requireSignIn = async (req, res, next) => {
     
     try {
-        const token =  req.headers.authorization
+        const token =  req.header('Authorization')
         const decode =   JWT.verify(token,process.env.JWT_SECRET)
-        req.user = decode.user;
-        // console.log(decode,token,"hii")
+        req.user = decode;
+        // console.log(req.user,token,"hii")
         next()
     } catch (error) {
         console.log(error);
@@ -18,7 +18,7 @@ export const requireSignIn = async (req, res, next) => {
 export const isAdmin = async (req, res, next) => {
     try {
         const user = await User.findById(req.user._id)
-        // console.log(req.user._id)
+        console.log(req.user._id)
                 if (user.role !== "admin") {
                     return res.status(401).json({ message: "UnAuthorized Access" })
                 }

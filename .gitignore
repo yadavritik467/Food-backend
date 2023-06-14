@@ -1,5 +1,7 @@
 /config
-/Frontend
+/Frontend/node_modules
+/Frontend/array_json - Copy.json
+/Frontend/array_json.json
 /node_modules
 
 

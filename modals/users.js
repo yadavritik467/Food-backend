@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
-    name: { type: String, trim: true, required: true },
-    number: { type: Number, trim: true, unique: true, required: true },
-    email: { type: String, trim: true, unique: true, required: true },
-    // googleId:{ type: String,trim:true, unique:true,required: true},
-    password: { type: String, required: true, select: false },
+    name: { type: String, trim: true,  },
+    number: { type: Number, trim: true, unique: true,  },
+    email: { type: String, trim: true, unique: true,  },
+    googleId:{ type: String,trim:true, unique:true,},
+    password: { type: String,  select: false },
     address: { type: String, },
     // role: { type: Number, default: 0 },
     role: { type: String, default: "user" },

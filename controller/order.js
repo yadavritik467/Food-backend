@@ -1,28 +1,30 @@
 import Order from "../modals/order.js";
-import Food from "../modals/Foods.js";
-import user from "../modals/users.js";
+// import Food from "../modals/Foods.js";
+// import user from "../modals/users.js";
 
 export const NewOrder = async (req, res) => {
     try {
         const {
             shippingInfo,
-            OrderItems,
+            orderItems,
             paymentInfo,
             itemsPrice,
+            taxPrice,
             shippingPrice,
-            totalPrice
+            totalPrice,
 
         } = req.body;
 
-        const order = Order.create({
+        let order = Order.create({
             shippingInfo,
-            OrderItems,
+            orderItems,
             paymentInfo,
             itemsPrice,
+            taxPrice,
             shippingPrice,
             totalPrice,
-            paidAt:Date.now(),
-            user:req.user.email
+            paidAt: Date.now(),
+           user:req.user._id
         })
 
         res.status(200).json({
@@ -57,7 +59,8 @@ export const getSingleOrder = async(req,res)=>{
 // get logged in user order
 
 export const myOrders = async(req,res)=>{
-    const order = await Order.find({user:req.user._id})
+    const order = await Order.findById({user:req.user._id})
+    console.log(order)
 
     res.status(200).json({
         success:true,
@@ -114,12 +117,12 @@ export const updateOrders = async(req,res)=>{
         order
     })
 
-    async function updateStock(id,quantity){
-        const food = await Food.findById(id);
+    // async function updateStock(id,quantity){
+    //     const food = await Food.findById(id);
 
-        food.stock -= quantity;
-        await food.save({validateBeforeSave: false})
-    }
+    //     food.stock -= quantity;
+    //     await food.save({validateBeforeSave: false})
+    // }
 }
 
 // delete order -- admin   make sure to check this function before procceding further

@@ -6,13 +6,13 @@ import { NewOrder, deleteOrders, getAllOrders, getSingleOrder, myOrders, updateO
 const router = express.Router()
 
 
-// router.get("/order/:id", requireSignIn , getSingleOrder) // add admin here later
-// router.post("/admin/orders", requireSignIn, isAdmin , getAllOrders) 
-// router.put("/admin/orders/:id", requireSignIn, isAdmin , updateOrders) 
-// router.delete("/admin/orders/:id", requireSignIn, isAdmin , deleteOrders) 
+router.get("/order/:id", requireSignIn,isAdmin, getSingleOrder) // add admin here later
+router.post("/admin/orders",requireSignIn,isAdmin,  getAllOrders) 
+router.put("/admin/orders/:id",requireSignIn,isAdmin,  updateOrders) 
+router.delete("/admin/orders/:id",requireSignIn,isAdmin,  deleteOrders) 
 
 
-// router.post("/order/new", requireSignIn , NewOrder)
-// router.post("/order/myOrders", requireSignIn , myOrders) 
+router.post("/order/new",requireSignIn, NewOrder)
+router.get("/order/myOrders",requireSignIn,  myOrders) 
 
 export default router

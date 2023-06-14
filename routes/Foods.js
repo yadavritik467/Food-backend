@@ -10,7 +10,7 @@ const router =  express.Router()
   
   
   
-           router.post("/create-foods", FoodController )     //add admin here later
+           router.post("/create-foods", requireSignIn, isAdmin, FoodController )     //add admin here later
             router.delete("/delete-foods/:id", deleteFoodController )   //add admin here later
 
 
