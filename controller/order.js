@@ -1,39 +1,33 @@
 import Order from "../modals/order.js";
-// import Food from "../modals/Foods.js";
-// import user from "../modals/users.js";
+import { increasePendingOrdersCount } from '../webSocket.js';
 
 export const NewOrder = async (req, res) => {
     try {
-        const {
-            shippingInfo,
-            orderItems,
+        const {userID,user,email, FoodID, quantity, address,OrderStatus,PaymentMethod,paymentInfo} = req.body.orderDetail;
+ 
+           
+    //    let total = 
+
+        const order =await Order.create({
+            userID,user,email,
+            FoodID,
+            quantity,
+            totalPrice: req.body.amount * 100 ,
+            total:(req.body.amount + 20) * 100 ,
+            address,
+            OrderStatus,
+            PaymentMethod,
             paymentInfo,
-            itemsPrice,
-            taxPrice,
-            shippingPrice,
-            totalPrice,
-
-        } = req.body;
-
-        let order = Order.create({
-            shippingInfo,
-            orderItems,
-            paymentInfo,
-            itemsPrice,
-            taxPrice,
-            shippingPrice,
-            totalPrice,
-            paidAt: Date.now(),
-           user:req.user._id
+            paidAt: Date.now(),       
         })
+        if(order){
+            return res.status(200).json({success: true,order, })
+        }
+           increasePendingOrdersCount()
 
-        res.status(200).json({
-            success: true,
-            order
-        })
     } catch (error) {
         console.error(error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             
         })
@@ -41,88 +35,52 @@ export const NewOrder = async (req, res) => {
 }
 
 
-// get single order
-
-export const getSingleOrder = async(req,res)=>{
-    const order = await Order.findById(req.params.id).populate("user"," name email address number")
-
-    if(!order){
-        res.status(404).json({message:"order not found by this id"})
-    }
-    res.status(200).json({
-        success:true,
-        order
-    })
-}
-
-
-// get logged in user order
-
-export const myOrders = async(req,res)=>{
-    const order = await Order.findById({user:req.user._id})
-    console.log(order)
-
-    res.status(200).json({
-        success:true,
-        order
-    })
-}
-// get all order -- admin   make sure to check this function before procceding further
-
 export const getAllOrders = async(req,res)=>{
-    const order = await Order.find()
-    
-    let totalAmount= 0;
+    try {
+        const order = await Order.find().sort({createdAt:-1})
+        
+    let totalRevenu= 0;
 
     order.forEach((o)=>{
-        totalAmount += order.totalPrice
+        totalRevenu = totalRevenu + o.total
     })
 
-    res.status(200).json({
+
+
+    return res.status(200).json({
         success:true,
-        totalAmount,
+        totalRevenu,
         order
     })
+    } catch (error) {
+        console.log(error)     
+        return res.status(500).json({
+        success:false,
+        message:"internal server error"
+    })
+
+    }
 }
 
 
 // update order status -- admin   make sure to check this function before procceding further
 
 export const updateOrders = async(req,res)=>{
-    const order = await Order.find(req.params.id)
-    if(!order){
-        res.status(404).json({message:"order not found by this id"})
-    }
 
-    if(order.orderStatus === "Delivered"){
-        res.status(404).json({message:"you have already delivered this order"})
-    }
-
-    order.orderItems.foreEach(async(o)=>{
-      await updateStock(o.Food,o.quantity)  
-    })
-
-    order.orderStatus = req.body.status;
+    const order = await Order.findById(req.params.id,{new:true}).sort({updatedAt:-1})
+        
+    order.OrderStatus = req.body.category;
+    order.paymentInfo = req.body.paymentStatus;
     
-    if(req.body.status === "Delivered"){
-        order.deliveredAt = Date.now();
-    }
+    await order.save()
 
-    await order.save({validateBeforeSave: false})
-
-
-    res.status(200).json({
+    return res.status(200).json({
+        message: 'Order updated successfully',
         success:true,
-        totalAmount,
         order
     })
 
-    // async function updateStock(id,quantity){
-    //     const food = await Food.findById(id);
-
-    //     food.stock -= quantity;
-    //     await food.save({validateBeforeSave: false})
-    // }
+    
 }
 
 // delete order -- admin   make sure to check this function before procceding further
@@ -131,14 +89,14 @@ export const deleteOrders = async(req,res)=>{
     const order = await Order.findById(req.params.id)
 
     if(!order){
-        res.status(404).json({message:"order not found by this id"})
+        res.status(404).json({message:"order not found by this id",order})
     }
     
-    await order.remove()
+    await Order.findByIdAndDelete(req.params.id)
 
-    res.status(200).json({
+    return res.status(200).json({
         success:true,
-        totalAmount,
-        order
+        message:"order deleted successfully",
+       
     })
 }

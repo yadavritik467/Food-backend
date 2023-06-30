@@ -1,18 +1,20 @@
 import express from "express"
 import { isAdmin, requireSignIn } from "../middleware/authMiddleware.js";
-import { NewOrder, deleteOrders, getAllOrders, getSingleOrder, myOrders, updateOrders } from "../controller/order.js"
+import { NewOrder, deleteOrders, getAllOrders, updateOrders } from "../controller/order.js"
+import  {startWebSocketServer}  from "../webSocket.js"
+
+
 
 
 const router = express.Router()
+startWebSocketServer()
+// router.get("/order/:id", requireSignIn,isAdmin, getSingleOrder) // add admin here later
+router.get("/admin/orders",requireSignIn,  getAllOrders,) 
+router.put("/admin/update-orders/:id",requireSignIn,  updateOrders) 
+router.delete("/admin/orders/:id",requireSignIn, deleteOrders) 
 
 
-router.get("/order/:id", requireSignIn,isAdmin, getSingleOrder) // add admin here later
-router.post("/admin/orders",requireSignIn,isAdmin,  getAllOrders) 
-router.put("/admin/orders/:id",requireSignIn,isAdmin,  updateOrders) 
-router.delete("/admin/orders/:id",requireSignIn,isAdmin,  deleteOrders) 
-
-
-router.post("/order/new",requireSignIn, NewOrder)
-router.get("/order/myOrders",requireSignIn,  myOrders) 
+router.post("/order/new", NewOrder,)
+// router.get("/order/myOrders",  myOrders) 
 
 export default router

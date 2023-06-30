@@ -1,53 +1,64 @@
 import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema({
-  
-  
-      
-      Food: {
-        type: mongoose.Schema.ObjectId,
-        ref: "foods",
-        
-      },
-   
+
+  userID:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"User"
+  },
   user: {
-    type: mongoose.Schema.ObjectId,
-    ref: "User",
-
+    type: Array,
+    required: true,
   },
-  paymentInfo: {
-    id: {
-      type: String,
-     
-    
-    },
-    status: {
-      type: String,
-      default:"paid"
-    
-    },
-  },
-  paidAt: {
-    type: Date,
-
-  },
- 
- 
   
+
+  FoodID: {
+    type: Array,
+    required: true,
+  },
+
   totalPrice: {
     type: Number,
-    
-    default: 0,
+    required: true,
   },
-  orderStatus: {
+  deliveryCahrge: {
+    type: Number,
+    default:20,
+  },
+  total:{
+    type: Number,
+  },
+  OrderStatus: {
     type: String,
+    //  enum:["processing","Delivered","cancle"],
+    default: "processing"
 
-    default: "Processing",
   },
-  deliveredAt: Date,
+  previousOrderStatus: {
+    type: String,
+    //  enum:["processing","Delivered","cancle"],
+    default: "Your previous order :"
+
+  },
+
+  PaymentMethod:{
+    type: String,
+  },
+
+  paymentInfo: {
+      type: String,
+      default: "paid"
+  },
   createdAt: {
     type: Date,
     default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
+  paidAt: {
+    type: Date,
   },
 });
 

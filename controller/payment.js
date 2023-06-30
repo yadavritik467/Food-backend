@@ -1,5 +1,6 @@
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
+// import orders from "../modals/order.js"
 import payments from "../modals/payment.js";
 
 export const payment = async (req, res) => {
@@ -11,8 +12,10 @@ export const payment = async (req, res) => {
             key_secret: process.env.KEY_SECRET
         });
         const options = {
-            amount: req.body.amount * 100,  // amount in the smallest currency unit
+            amount: (req.body.amount + 20 ) * 100,  // amount in the smallest currency unit
             currency: "INR",
+            // orderId: order_id,
+            payment_capture: 1,
             receipt: crypto.randomBytes(10).toString("hex"),
         };
         instance.orders.create(options, (error, order) => {
@@ -24,14 +27,14 @@ export const payment = async (req, res) => {
         });
     } catch (error) {
         console.log(error)
-        res.status(501).json({ success: false, message: "internal server error" });
+        return res.status(501).json({ success: false, message: "internal server error" });
     }
 
 }
 
 export const paymentVarification = async (req, res) => {
 
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body
+    const {userID, razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
     const sign = razorpay_order_id + "|" + razorpay_payment_id;
 
 
@@ -42,15 +45,16 @@ export const paymentVarification = async (req, res) => {
 
     if (expectedSignature === razorpay_signature) {
         await payments.create({
+            userID,
             razorpay_order_id,
             razorpay_payment_id,
             razorpay_signature
         })
-        res.status(200).json({ message: "payment verified successfully" });
+        return res.status(200).json({ message: "payment verified successfully" });
 
 
     } else {
-        res.status(200).json({ message: "invalid signature sent" });
+        return res.status(200).json({ message: "invalid signature sent" });
     }
 
 

@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const paymentSchema = new mongoose.Schema({
-    email:{ type: mongoose.Schema.Types.ObjectId,ref:"User "},
+    userID:{ type: mongoose.Schema.Types.ObjectId,ref:"User "},
     razorpay_order_id:{
     type: 'string', required: true,
 },

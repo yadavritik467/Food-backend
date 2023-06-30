@@ -19,7 +19,7 @@ import cloudinary from "cloudinary"
             
         },heading,title})
    
-        res.status(200).json({message:"carousel created successfully",caro})
+        return res.status(200).json({message:"carousel created successfully",caro})
     } catch (error) {
       console.error(error) 
       res.status(500).json({message:" error in creating carousel",error}) 
@@ -30,7 +30,7 @@ import cloudinary from "cloudinary"
     try {
         const caro = await Caro.find()
    
-        res.status(200).json({message:"carousel created successfully",caro})
+        return res.status(200).json({message:"carousel created successfully",caro})
     } catch (error) {
       console.error(error) 
       res.status(500).json({message:" error in getting carousel",error}) 
@@ -46,7 +46,7 @@ import cloudinary from "cloudinary"
      
         let caro = await Caro.findByIdAndDelete(req.params.id)
               
-        res.status(200).json({message:"carousel deleted successfully",caro})
+        return res.status(200).json({message:"carousel deleted successfully",caro})
     } catch (error) {
       console.error(error) 
       res.status(500).json({message:" error in getting carousel",error}) 

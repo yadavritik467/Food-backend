@@ -15,7 +15,7 @@ const FoodSchema = new mongoose.Schema({
 
     },
     category: { type: String, require: true },
-    price: { type: Number,  },
+    price: { type: Number  },
  
   
     createdAt:{ type: Date, default:Date.now}

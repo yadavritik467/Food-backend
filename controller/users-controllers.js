@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt"
 import User from "../modals/users.js"
-// import { google } from "../modals/google.js"
+import sendPasswordResetEmail from "../utils/sendPasswordResetEmail.js"
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 
@@ -11,56 +11,41 @@ export const connectPassport = (res) => {
         clientID: process.env.CLIENT_ID,
         clientSecret: process.env.CLIENT_SECRET,
         callbackURL: "http://localhost:4500/auth/google/callback",
+        userProfileURL: 'https://www.googleapis.com/oauth2/v3/userinfo',
+        // scope: ['profile', 'email',
+        //  'https://www.googleapis.com/auth/user.phonenumbers.read', 
+        // 'https://www.googleapis.com/auth/user.addresses.read'],
         passReqToCallback: true
     },
         async (req, res, accessToken, refreshToken, profile, done) => {
 
 
-            console.log(profile);
+            // console.log(profile);
             const existingUser = await User.findOne({
                 googleId: profile.id,
             })
 
             if (existingUser) {
                 // User already exists, return the user
+
                 done(null, existingUser);
-            } 
+            } else {
 
-             // Create a new user
-             const user = await User.create({
-                googleId: profile.id,
-                name: profile.displayName,
-                email:profile.emails[0].value,
-                // address: profile.address,
-                // number: profile.number
-            });
+                // Create a new user
+                const user = await User.create({
+                    googleId: profile.id,
+                    name: profile.displayName,
+                    email: profile.emails[0].value,
+                    secret: accessToken,
+                    number: profile.phone_number,
+                    address: profile.address,
+                });
 
-            // Set the JWT token
+                console.log(user)
+                done(null, user,);
 
-            const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: "365d", })
-            res.json({ token: token})
-            done(null, user,token);
+            }
 
-
-
-            // if(!user){
-            //     const newUser = new google({
-            //         googleId: profile.id,
-            //         name: profile.displayName,
-            //         // number: profile.number,
-            //         // email: profile.email,
-            //         secret: accessToken,
-            //     });
-            //     await newUser.save().then((result)=>{
-            //         console.log(newUser);
-            //         return done(null,user)
-            //     })
-            // }else{
-            //     console.log(user)
-            //     return done(null,user)
-            // }
-            // console.log(user.email);
-            // return done(null, user);     
 
         }
     )
@@ -69,7 +54,7 @@ export const connectPassport = (res) => {
         done(null, user.id);
     });
 
-    passport.deserializeUser(async (user, done) => {
+    passport.deserializeUser(async (user, id, done) => {
         const newUser = await User.findById(id)
         done(null, newUser.id);
     })
@@ -79,33 +64,45 @@ export const connectPassport = (res) => {
 
 
 
-export const register = async (req, res, next) => {
-    const { name, number, email, password, address } = req.body
+export const register = async (req, res) => {
+
+
 
     try {
+
+        let { name, number, email, password, address } = req.body
+
         const existingUser = await User.findOne({ email })
-
         if (existingUser) {
-            return res.status(400).json({ message: "User already exists" })
+
+            return res.status(200).json({ message: "this email is already in use", existingUser })
         }
+        const existingNumber = await User.findOne({ number })
+        if (existingNumber) {
 
+            return res.status(200).json({ message: "this number is already in use", existingNumber })
+        }
         const hashPassword = bcrypt.hashSync(password, 10)
-        const user = new User({
-
+        // const chashedPassword = bcrypt.hashSync(cpassword, 10)
+        const user = await User.create({
             name,
             number,
             email,
             password: hashPassword,
-            address,
+            address
         })
-        await user.save()
-        const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: "365d", })
 
-        res.status(201).json({ message: "user succesfully created", token })
+        await user.save()
+        return res.status(200).json({ message: "user created successfully", user })
+
+
+
     } catch (error) {
         console.log(error)
-        return res.status(501).json({ message: "Internal server errord" })
+        res.status(500).json("internal server")
     }
+
+
 }
 
 
@@ -119,19 +116,19 @@ export const login = async (req, res, next) => {
 
         // console.log(user,req.body)
         if (!user) {
-            return res.status(400).json({ message: "User doesn't exist !! please create account " })
+            return res.status(400).json({ message: "User doesn't exist !! please create account ",user })
         }
 
         const isPasswordValid = bcrypt.compareSync(password, user.password)
 
         if (!isPasswordValid) {
-            return res.status(400).json({ message: "Invalid email or password" })
+            return res.status(400).json({ message: "Invalid email or password", })
         }
 
         // token
         console.log(user._id)
         const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: "365d", })
-        res.json({
+        return res.json({
             message: "login successfully",
             token,
             user: {
@@ -153,12 +150,37 @@ export const login = async (req, res, next) => {
 export const usersController = async (req, res) => {
     try {
         const user = await User.find({})
-        res.status(201).json({ message: "All users lists", user })
+        return res.status(201).json({ message: "All users lists", user })
     } catch (err) {
-        res.status(500).json({ message: "error in getting all users" });
+        return res.status(500).json({ message: "error in getting all users" });
     }
 
 }
+
+// forgot password
+
+export const forgotPassword = async (req, res) => {
+
+    try {
+        const user = await User.findOne({ email: req.body.email });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' })
+        };
+
+        const token = jwt.sign({ _id: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: "365d", })
+
+
+        await user.save();
+
+        await sendPasswordResetEmail({ email: user.email, token });
+
+        return res.status(201).json({ message: 'Password reset email sent successfully.' });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Internal server error.' });
+    }
+}
+
 
 // delete category
 export const deleteUsersController = async (req, res) => {
@@ -166,10 +188,10 @@ export const deleteUsersController = async (req, res) => {
         const _id = req.query.id;
         // console.log(req.query)
         const user = await User.findByIdAndDelete(_id)
-        res.status(201).json({ message: " Deleted User " })
+        return res.status(201).json({ message: " Deleted User " })
     } catch (err) {
         console.log(err)
-        res.status(500).json({ message: "error in deleting  user" });
+        return res.status(500).json({ message: "error in deleting  user" });
     }
 
 }
