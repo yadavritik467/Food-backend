@@ -3,7 +3,7 @@ import ua from "universal-analytics"
 // const ua = require('');
 
  const trackPageView = (req, res, next) => {
-  const visitor = ua('YOUR_TRACKING_ID', { uid: req.user ? req.user._id : 'anonymous' });
+  const visitor = ua('G-NYNR53YLS6', { uid: req.user ? req.user._id : 'anonymous' });
 
   // Track page views
   visitor.pageview(req.originalUrl, (err) => {
