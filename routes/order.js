@@ -14,7 +14,7 @@ router.put("/admin/update-orders/:id",requireSignIn,  updateOrders)
 router.delete("/admin/orders/:id",requireSignIn, deleteOrders) 
 
 
-router.post("/order/new", NewOrder,)
+router.post("/order/new",requireSignIn, NewOrder,)
 // router.get("/order/myOrders",  myOrders) 
 
 export default router
