@@ -12,7 +12,7 @@ export const connectPassport = (res) => {
         session:false,
         clientID: process.env.CLIENT_ID,
         clientSecret: process.env.CLIENT_SECRET,
-        callbackURL: "http://localhost:4500/auth/google/callback",
+        callbackURL: "https://food-backend-zeta.vercel.app/auth/google/callback",
         userProfileURL: 'https://www.googleapis.com/oauth2/v3/userinfo',
         scope: ['profile', 'email',
         //  'https://www.googleapis.com/auth/user.phonenumbers.read', 
