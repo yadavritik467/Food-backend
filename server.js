@@ -14,6 +14,7 @@ import {config} from "dotenv"
 import cloudinary from "cloudinary"
 import fileUpload from "express-fileupload"
 import passport from "passport"
+import cookieParser from "cookie-parser"
 import { connectPassport } from "./controller/users-controllers.js"
 // import path from "path"
 // import { fileURLToPath } from 'url';
@@ -40,7 +41,7 @@ const port =  process.env.PORT
 
 // middleware
 
-app.use(cors()),
+
 mongoDB()
 cloudinary.config({
   cloud_name:process.env.API_NAME,
@@ -49,22 +50,37 @@ cloudinary.config({
   URL:process.env.URL,
   
 })
-app.use(express.json())
+app.use(express.json({limit:"50mb"}))
+app.use(express.urlencoded({limit:"50mb",extended: true}));
 app.use(
-  session({
-    secret: 'your-secret-key',
-    resave: true,
-    saveUninitialized: true,
+  cors({
+    origin: 'http://localhost:3000', // Update this to match your frontend's origin
+    credentials: true,
   })
 );
+app.use(
+  session({
+    name:"google",
+    secret: 'your-secret-key',
+    resave: false,
+    saveUninitialized: false,
+
+  })
+  );
+
+  app.use(cookieParser())
+
+
 
 // Initialize Passport.js
+app.use(passport.authenticate("session"));
+connectPassport()
 app.use(passport.initialize());
 app.use(passport.session());
+
 // app.use('/',express.static('./Frontend/build/'))
-app.use(express.urlencoded({extended: true}))
-app.use(fileUpload({useTempFiles: true}))
-connectPassport()
+
+
 
 
 // middleware
