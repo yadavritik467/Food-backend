@@ -56,6 +56,7 @@ app.use(
   cors({
     origin: 'http://localhost:3000', // Update this to match your frontend's origin
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
   })
 );
 app.use(
